@@ -1,24 +1,13 @@
-// Helper
-// https://cmatskas.com/get-url-parameters-using-javascript/
-var parseQueryString = function(url) {
-  var urlParams = {};
-  url.replace(
-    new RegExp("([^?=&]+)(=([^&]*))?", "g"),
-    function($0, $1, $2, $3) {
-      urlParams[$1] = $3;
-    }
-  );
-  return urlParams;
-}
-var urlParams = parseQueryString(location.search);
-
-// Categories
 function CategoryManager() {
 
   this.categories = [];
   this.currentCategory = false;
   this.url = "http://api.origin.berlin/category";
   this.menu = $("#category-menu");
+
+  this.init = function() {
+    this.loadCategories();
+  }
 
   this.loadCategories = function() {
     var that = this;
@@ -44,9 +33,9 @@ function CategoryManager() {
   this.setCurrentCategory = function() {
     var that = this;
 
-    if (!urlParams.catID) return; // break if there is now param in the URL!
+    if (!shopManager.urlParams.catID) return; // break if there is now param in the URL!
     $.each(this.categories, function(index, category) {
-      if (category.id == urlParams.catID) {
+      if (category.id == shopManager.urlParams.catID) {
         that.currentCategory = category;
         $(".category-name").text(category.name);
       }
@@ -56,10 +45,6 @@ function CategoryManager() {
   }
 
 }
-
-var categoryManager = new CategoryManager();
-categoryManager.loadCategories();
-
 
 function BookManager() {
 
@@ -92,8 +77,8 @@ function BookManager() {
     var that = this;
 
     $.each(this.books, function(index, book) {
-      if (book.category_id == categoryManager.currentCategory.id || categoryManager.currentCategory == false) {
-		var div = $("<div>").addClass("col-3");
+      if (book.category_id == shopManager.categoryManager.currentCategory.id || shopManager.categoryManager.currentCategory == false) {
+        var div = $("<div>").addClass("col-3");
         $("<img>").attr("src", book.image).addClass("img-fluid").appendTo(div);
         var p = $("<p>").appendTo(div);
         $("<a>").attr("href", "detail.html?book=" + book.slug).text(book.title).appendTo(p);
@@ -105,10 +90,10 @@ function BookManager() {
   this.setCurrentBook = function() {
     var that = this;
 
-    if (!urlParams.book) return; // break if there is no param in the URL!
+    if (!shopManager.urlParams.book) return; // break if there is no param in the URL!
 
     $.each(this.books, function(index, book) {
-      if (book.slug == urlParams.book) {
+      if (book.slug == shopManager.urlParams.book) {
         that.currentBook = book;
         $(".book-image").attr("src", that.currentBook.image);
         $(".book-title").text(that.currentBook.title);
@@ -123,14 +108,6 @@ function BookManager() {
   }
 }
 
-var bookManager = new BookManager();
-bookManager.init();
-
-
-
-
-
-
 function CartManager() {
 
   this.cart = [];
@@ -144,29 +121,29 @@ function CartManager() {
     that._updateCartIcon();
     $(".cart-amount").text(this.cart.length);
 
-    $(".add-to-cart").on("click",function(){
-      that.addItem( bookManager.currentBook );
+    $(".cart-add").on("click", function() {
+      that.addItem(shopManager.bookManager.currentBook);
     });
-    $(".cart-checkout").on("click",function(){
+    $(".cart-checkout").on("click", function() {
       that.checkout();
     });
-    $(".cart-clear").on("click",function(){
+    $(".cart-clear").on("click", function() {
       that.clear();
     });
-    $(document).on("click",".cart-delete-item", function(){
+    $(document).on("click", ".cart-delete-item", function() {
       that.deleteItem($(this).data("index"));
     });
     that.display();
   }
 
-  this.display = function(){
+  this.display = function() {
     var that = this;
     var total = 0;
     that.container.html("");
-    $.each(that.cart,function(index,item){
+    $.each(that.cart, function(index, item) {
       var row = $("<tr>");
       $("<td>").text(item.id).appendTo(row);
-      $("<td>").html( $("<img>").attr("src", item.image )).appendTo(row);
+      $("<td>").html($("<img>").attr("src", item.image)).appendTo(row);
       $("<td>").text(item.title).appendTo(row);
       $("<td>").text(item.author).appendTo(row);
       $("<td>").text(item.price).appendTo(row);
@@ -178,56 +155,67 @@ function CartManager() {
     $(".cart-total").text(total);
   }
 
-  this.deleteItem = function(itemIndex){
-    this.cart.splice(itemIndex,1);
+  this.deleteItem = function(itemIndex) {
+    this.cart.splice(itemIndex, 1);
     this._updateStorage();
-  } 
+  }
 
-  this.addItem = function(item){
+  this.addItem = function(item) {
     this.cart.push(item);
     this._updateStorage();
     window.location.href = "cart.html";
   }
 
-  this.clear = function(){
+  this.clear = function() {
     this.cart = [];
     this._updateStorage();
     window.location.href = "index.html";
   }
 
-  this.checkout = function(){
+  this.checkout = function() {
     alert("Thanks!");
     this.clear();
   }
 
-  this._updateStorage = function(){
-    localStorage.setItem("cart",JSON.stringify(this.cart));
+  this._updateStorage = function() {
+    localStorage.setItem("cart", JSON.stringify(this.cart));
     this._updateCartIcon();
     this.display();
   }
 
   this._updateCartIcon = function() {
     this.cartButton.text(this.cart.length);
-    this.cartButton.parent().toggleClass("text-success", this.cart.length != 0 )
+    this.cartButton.parent().toggleClass("text-success", this.cart.length != 0)
   }
 
 }
 
-var cartManager = new CartManager();
-cartManager.init();
 
+function ShopManager() {
 
+  this.cartManager = new CartManager();
+  this.bookManager = new BookManager();
+  this.categoryManager = new CategoryManager();
+  this.urlParams = {};
 
+  this.init = function() {
+    this.parseURL();
+    this.cartManager.init();
+    this.bookManager.init();
+    this.categoryManager.init();
+  }
 
+  this.parseURL = function() {
+    var that = this;
+    window.location.search.replace(
+      new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+      function($0, $1, $2, $3) {
+        that.urlParams[$1] = $3;
+      }
+    );
+  }
 
+}
 
-
-
-
-
-
-
-
-
-
-
+var shopManager = new ShopManager();
+shopManager.init();
