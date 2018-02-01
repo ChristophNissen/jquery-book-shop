@@ -136,10 +136,14 @@ function CartManager() {
   this.cart = [];
   this.checkoutButton = $("#checkoutButton");
   this.container = $("#shoppingCart");
+  this.cartButton = $(".cart-amount");
 
   this.init = function() {
     var that = this;
-    that.cart = JSON.parse(localStorage.getItem("cart")); 
+    that.cart = (localStorage.getItem("cart")) ? JSON.parse(localStorage.getItem("cart")) : [];
+    that._updateCartIcon();
+    $(".cart-amount").text(this.cart.length);
+
     $(".add-to-cart").on("click",function(){
       that.addItem( bookManager.currentBook );
     });
@@ -197,11 +201,15 @@ function CartManager() {
   }
 
   this._updateStorage = function(){
-    console.log(this);
     localStorage.setItem("cart",JSON.stringify(this.cart));
+    this._updateCartIcon();
     this.display();
   }
 
+  this._updateCartIcon = function() {
+    this.cartButton.text(this.cart.length);
+    this.cartButton.parent().toggleClass("text-success", this.cart.length != 0 )
+  }
 
 }
 
