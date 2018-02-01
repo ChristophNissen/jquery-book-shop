@@ -1,0 +1,22 @@
+{
+  "name": "jquery-book-shop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "live-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristophNissen/jquery-book-shop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChristophNissen/jquery-book-shop/issues"
+  },
+  "homepage": "https://github.com/ChristophNissen/jquery-book-shop#readme",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
+}

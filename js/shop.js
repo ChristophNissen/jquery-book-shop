@@ -139,7 +139,7 @@ function CartManager() {
 
   this.init = function() {
     var that = this;
-    that.cart = JSON.parse(localStorage.getItem("cart"));
+    that.cart = JSON.parse(localStorage.getItem("cart")); 
     $(".add-to-cart").on("click",function(){
       that.addItem( bookManager.currentBook );
     });
