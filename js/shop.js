@@ -123,8 +123,103 @@ function BookManager() {
   }
 }
 
-
-
-
 var bookManager = new BookManager();
 bookManager.init();
+
+
+
+
+
+
+function CartManager() {
+
+  this.cart = [];
+  this.checkoutButton = $("#checkoutButton");
+  this.container = $("#shoppingCart");
+
+  this.init = function() {
+    var that = this;
+    that.cart = JSON.parse(localStorage.getItem("cart"));
+    $(".add-to-cart").on("click",function(){
+      that.addItem( bookManager.currentBook );
+    });
+    $(".cart-checkout").on("click",function(){
+      that.checkout();
+    });
+    $(".cart-clear").on("click",function(){
+      that.clear();
+    });
+    $(document).on("click",".cart-delete-item", function(){
+      that.deleteItem($(this).data("index"));
+    });
+    that.display();
+  }
+
+  this.display = function(){
+    var that = this;
+    var total = 0;
+    that.container.html("");
+    $.each(that.cart,function(index,item){
+      var row = $("<tr>");
+      $("<td>").text(item.id).appendTo(row);
+      $("<td>").html( $("<img>").attr("src", item.image )).appendTo(row);
+      $("<td>").text(item.title).appendTo(row);
+      $("<td>").text(item.author).appendTo(row);
+      $("<td>").text(item.price).appendTo(row);
+      var closeButton = $("<button>").addClass("btn btn-outline-warning cart-delete-item").html("&times;").attr("data-index", index);
+      $("<td>").html(closeButton).appendTo(row);
+      that.container.append(row);
+      total += item.price;
+    });
+    $(".cart-total").text(total);
+  }
+
+  this.deleteItem = function(itemIndex){
+    this.cart.splice(itemIndex,1);
+    this._updateStorage();
+  } 
+
+  this.addItem = function(item){
+    this.cart.push(item);
+    this._updateStorage();
+    window.location.href = "cart.html";
+  }
+
+  this.clear = function(){
+    this.cart = [];
+    this._updateStorage();
+    window.location.href = "index.html";
+  }
+
+  this.checkout = function(){
+    alert("Thanks!");
+    this.clear();
+  }
+
+  this._updateStorage = function(){
+    console.log(this);
+    localStorage.setItem("cart",JSON.stringify(this.cart));
+    this.display();
+  }
+
+
+}
+
+var cartManager = new CartManager();
+cartManager.init();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -43,37 +43,32 @@
   			<h2>Shopping Cart</h2>
   		</div>
   	</div>
+    <div class="row">
+      <div class="col text-right">
+        <button class="btn btn-outline-danger cart-clear">clear cart</button>
+      </div>
+    </div>
   	<div class="row">
   		<div class="col">
         <table class="table table-striped">
           <thead>
             <tr>
               <th>ID</th>
+              <th></th>
               <th>Book Title</th>
               <th>Author</th>
               <th>Price</th>
+              <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>IsdfsdfD</td>
-              <td>fasdfa dsf</td>
-              <td>asdfa</td>
-              <td>asdfasd</td>
-            </tr>
-            <tr>
-              <td>IsdfsdfD</td>
-              <td>fasdfa dsf</td>
-              <td>asdfa</td>
-              <td>asdfasd</td>
-            </tr>
+          <tbody id="shoppingCart">
           </tbody>
         </table>
         <div class="text-right">
           <p>
-            Total: <span>100.00</span>
+            Total: <span class="cart-total"></span>
           </p>
-          <button class="btn btn-primary">Checkout</button>
+          <button class="btn btn-primary cart-checkout">Checkout</button>
         </div>
   		</div>
   	</div>
